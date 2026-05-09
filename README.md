@@ -19,7 +19,8 @@ This package is a maintained fork of [`seungmun/laravel-sens`](https://github.co
 
 ## Requirements
 
-- PHP 8.1 or higher
+- PHP 8.2 or higher for Laravel 10, 11, and 12
+- PHP 8.3 or higher for Laravel 13
 - Laravel 10, 11, 12, or 13
 - NCLOUD SENS credentials and service IDs
 

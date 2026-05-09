@@ -50,9 +50,7 @@ class SensSmsChannelTest extends TestCase
 
         $notification = new class($message) extends Notification
         {
-            public function __construct(private SmsMessage $message)
-            {
-            }
+            public function __construct(private SmsMessage $message) {}
 
             public function toSms($notifiable): SmsMessage
             {

@@ -8,29 +8,18 @@ use Seungmun\Sens\Exceptions\SensException;
 class SmsChannel
 {
     /**
-     * SENS instance implements.
-     *
-     * @var Sms
-     */
-    protected $sms;
-
-    /**
      * Create a new SENS sms channel instance.
      */
-    public function __construct(Sms $sens)
-    {
-        $this->sms = $sens;
-    }
+    public function __construct(protected Sms $sms) {}
 
     /**
      * Send the specified SENS notification.
      *
      * @param  mixed  $notifiable
-     * @return void
      *
      * @throws SensException
      */
-    public function send($notifiable, Notification $notification)
+    public function send($notifiable, Notification $notification): void
     {
         /** @var SmsMessage $message */
         $message = $notification->{'toSms'}($notifiable);

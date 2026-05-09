@@ -4,43 +4,28 @@ namespace Seungmun\Sens\AlimTalk;
 
 class AlimTalkMessage
 {
-    /** @var string */
-    public $countryCode = '82';
+    public string $countryCode = '82';
 
-    /** @var string */
-    public $to = '';
+    public string $to = '';
 
-    /** @var string */
-    public $content = '';
+    public string $content = '';
 
-    /** @var array */
-    public $buttons = [];
+    public array $buttons = [];
 
-    /** @var string */
-    protected $reserveTime;
+    protected ?string $reserveTime = null;
 
-    /** @var string */
-    protected $reserveTimeZone;
+    protected ?string $reserveTimeZone = null;
 
-    /** @var string */
-    protected $scheduleCode;
+    protected ?string $scheduleCode = null;
 
-    /**
-     * @var string
-     */
-    protected $templateCode;
+    protected string $templateCode = '';
 
-    /**
-     * @var string
-     */
-    protected $plusFriendId;
+    protected ?string $plusFriendId;
 
     /**
      * Create a new AlimTalkMessage instance.
-     *
-     * @param  string|null  $friendId
      */
-    public function __construct($friendId = null)
+    public function __construct(?string $friendId = null)
     {
         $this->plusFriendId = $friendId ? $friendId : config('laravel-sens.plus_friend_id');
     }
@@ -48,7 +33,7 @@ class AlimTalkMessage
     /**
      * @return $this
      */
-    public function countryCode(string $countryCode)
+    public function countryCode(string $countryCode): static
     {
         $this->countryCode = $countryCode;
 
@@ -58,7 +43,7 @@ class AlimTalkMessage
     /**
      * @return $this
      */
-    public function to(string $to)
+    public function to(string $to): static
     {
         $this->to = $to;
 
@@ -68,7 +53,7 @@ class AlimTalkMessage
     /**
      * @return $this
      */
-    public function content(string $content)
+    public function content(string $content): static
     {
         $this->content = $content;
 
@@ -78,7 +63,7 @@ class AlimTalkMessage
     /**
      * @return $this
      */
-    public function addButton(array $button)
+    public function addButton(array $button): static
     {
         $this->buttons[] = $button;
 
@@ -86,11 +71,9 @@ class AlimTalkMessage
     }
 
     /**
-     * @param  string  $reserveTime
-     * @param  string  $reserveTimeZone
      * @return AlimTalkMessage
      */
-    public function setReserved($reserveTime, $reserveTimeZone = 'Asia/Seoul')
+    public function setReserved(string $reserveTime, string $reserveTimeZone = 'Asia/Seoul'): static
     {
         $this->reserveTime = $reserveTime;
         $this->reserveTimeZone = $reserveTimeZone;
@@ -101,11 +84,9 @@ class AlimTalkMessage
     /**
      * @return $this
      */
-    public function setSchedule(string $code)
+    public function setSchedule(string $code): static
     {
-        if ($this->scheduleCode) {
-            $this->scheduleCode = $code;
-        }
+        $this->scheduleCode = $code;
 
         return $this;
     }
@@ -113,7 +94,7 @@ class AlimTalkMessage
     /**
      * @return $this
      */
-    public function plusFriendId(string $id)
+    public function plusFriendId(string $id): static
     {
         $this->plusFriendId = $id;
 
@@ -123,17 +104,14 @@ class AlimTalkMessage
     /**
      * @return $this
      */
-    public function templateCode(string $code)
+    public function templateCode(string $code): static
     {
         $this->templateCode = $code;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         $buffer = [
             'plusFriendId' => $this->plusFriendId,

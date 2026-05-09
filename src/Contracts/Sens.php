@@ -15,8 +15,6 @@ interface Sens
 
     /**
      * Handle the send action.
-     *
-     * @return void
      */
-    public function send(array $params);
+    public function send(array $params): void;
 }
