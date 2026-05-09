@@ -25,17 +25,11 @@ class AlimTalkRequest
     /** @var string */
     public $scheduleCode = '';
 
-    /**
-     * @param  array  $params
-     */
     public function __construct(array $params)
     {
         $this->mappingParams($params);
     }
 
-    /**
-     * @param  array  $params
-     */
     protected function mappingParams(array $params)
     {
         $attributes = ['plusFriendId', 'templateCode', 'messages', 'reserveTime', 'reserveTimeZone', 'scheduleCode'];
@@ -65,7 +59,6 @@ class AlimTalkRequest
     }
 
     /**
-     * @param  \Seungmun\Sens\AlimTalk\AlimTalkMessage  $message
      * @return $this
      */
     public function addMessage(AlimTalkMessage $message)

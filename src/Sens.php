@@ -7,7 +7,7 @@ use Seungmun\Sens\Contracts\Sens as SensContract;
 
 abstract class Sens implements SensContract
 {
-    /** @var \GuzzleHttp\Client */
+    /** @var Client */
     protected $http;
 
     /** @var string */
@@ -27,8 +27,6 @@ abstract class Sens implements SensContract
 
     /**
      * Create a new SENS instance.
-     *
-     * @param  array  $config
      */
     public function __construct(array $config)
     {
@@ -44,11 +42,11 @@ abstract class Sens implements SensContract
     /**
      * Create a new HTTP Request Client.
      *
-     * @return \GuzzleHttp\Client
+     * @return Client
      */
     protected function httpClient()
     {
-        return $this->http ?: $this->http = new Client();
+        return $this->http ?: $this->http = new Client;
     }
 
     /**
@@ -76,8 +74,7 @@ abstract class Sens implements SensContract
     /**
      * Set SENS service identifier.
      *
-     * @param  string  $serviceId
-     * @return \Seungmun\Sens\Sens
+     * @return Sens
      */
     public function setServiceId(string $serviceId)
     {
@@ -99,8 +96,7 @@ abstract class Sens implements SensContract
     /**
      * Set SENS access key.
      *
-     * @param  string  $accessKey
-     * @return \Seungmun\Sens\Sens
+     * @return Sens
      */
     public function setAccessKey(string $accessKey)
     {
@@ -122,8 +118,7 @@ abstract class Sens implements SensContract
     /**
      * Set SENS secret key.
      *
-     * @param  string  $secretKey
-     * @return \Seungmun\Sens\Sens
+     * @return Sens
      */
     public function setSecretKey(string $secretKey)
     {
@@ -142,7 +137,7 @@ abstract class Sens implements SensContract
     public function resolveEndpoint($uri, $params)
     {
         foreach ($params as $key => $value) {
-            $uri = str_replace('{' . $key . '}', $value, $uri);
+            $uri = str_replace('{'.$key.'}', $value, $uri);
         }
 
         $tokens = explode(' ', $uri);
@@ -181,14 +176,12 @@ abstract class Sens implements SensContract
      */
     protected function timestamp()
     {
-        return strval((int)round(microtime(true) * 1000));
+        return strval((int) round(microtime(true) * 1000));
     }
 
     /**
      * Add a new HTTP header attribute.
      *
-     * @param  string  $key
-     * @param  string  $value
      * @return $this
      */
     public function addHeader(string $key, string $value)
@@ -211,7 +204,7 @@ abstract class Sens implements SensContract
         $buffer = [];
 
         // Important - do not change these all lines down here ever!
-        array_push($buffer, strtoupper($method) . " " . $uri);
+        array_push($buffer, strtoupper($method).' '.$uri);
         array_push($buffer, $timestamp);
         array_push($buffer, $this->getAccessKey());
 
@@ -235,8 +228,7 @@ abstract class Sens implements SensContract
     /**
      * Remove the given HTTP header.
      *
-     * @param  string  $key
-     * @return \Seungmun\Sens\Sens
+     * @return Sens
      */
     public function removeHeader(string $key)
     {

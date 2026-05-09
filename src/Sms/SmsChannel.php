@@ -3,20 +3,19 @@
 namespace Seungmun\Sens\Sms;
 
 use Illuminate\Notifications\Notification;
+use Seungmun\Sens\Exceptions\SensException;
 
 class SmsChannel
 {
     /**
      * SENS instance implements.
      *
-     * @var \Seungmun\Sens\Sms\Sms
+     * @var Sms
      */
     protected $sms;
 
     /**
      * Create a new SENS sms channel instance.
-     *
-     * @param  \Seungmun\Sens\Sms\Sms  $sens
      */
     public function __construct(Sms $sens)
     {
@@ -27,13 +26,13 @@ class SmsChannel
      * Send the specified SENS notification.
      *
      * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
      * @return void
-     * @throws \Seungmun\Sens\Exceptions\SensException
+     *
+     * @throws SensException
      */
     public function send($notifiable, Notification $notification)
     {
-        /** @var \Seungmun\Sens\Sms\SmsMessage $message */
+        /** @var SmsMessage $message */
         $message = $notification->{'toSms'}($notifiable);
 
         $this->sms->send($message->toArray());

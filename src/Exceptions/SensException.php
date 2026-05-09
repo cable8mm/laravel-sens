@@ -10,7 +10,7 @@ class SensException extends Exception
      * Exception for Invalid NCLOUD SENS Tokens.
      *
      * @param  string  $message
-     * @return \Seungmun\Sens\Exceptions\SensException
+     * @return SensException
      */
     public static function InvalidNCPTokens($message)
     {

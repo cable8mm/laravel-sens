@@ -2,11 +2,11 @@
 
 namespace Seungmun\Sens;
 
+use Illuminate\Support\ServiceProvider;
 use Seungmun\Sens\AlimTalk\AlimTalk;
 use Seungmun\Sens\AlimTalk\AlimTalkChannel;
 use Seungmun\Sens\Sms\Sms;
 use Seungmun\Sens\Sms\SmsChannel;
-use Illuminate\Support\ServiceProvider;
 
 class SensServiceProvider extends ServiceProvider
 {
@@ -18,7 +18,7 @@ class SensServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__ . '/../config/laravel-sens.php',
+            __DIR__.'/../config/laravel-sens.php',
             'laravel-sens'
         );
 
@@ -45,7 +45,7 @@ class SensServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__ . '/../config/laravel-sens.php' => config_path('laravel-sens.php')
+            __DIR__.'/../config/laravel-sens.php' => config_path('laravel-sens.php'),
         ], 'config');
     }
 

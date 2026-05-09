@@ -3,14 +3,11 @@
 namespace Seungmun\Sens\AlimTalk;
 
 use Exception;
-use Seungmun\Sens\Sens;
 use Seungmun\Sens\Exceptions\SensException;
+use Seungmun\Sens\Sens;
 
 class AlimTalk extends Sens
 {
-    /**
-     * @param  array  $config
-     */
     public function __construct(array $config)
     {
         parent::__construct($config);
@@ -19,10 +16,9 @@ class AlimTalk extends Sens
     }
 
     /**
-     * @param  array  $params
      * @return void
      *
-     * @throws \Seungmun\Sens\Exceptions\SensException
+     * @throws SensException
      */
     public function send(array $params)
     {

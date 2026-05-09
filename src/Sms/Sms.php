@@ -3,17 +3,17 @@
 namespace Seungmun\Sens\Sms;
 
 use Exception;
-use Seungmun\Sens\Sens;
 use Seungmun\Sens\Exceptions\SensException;
+use Seungmun\Sens\Sens;
 
 class Sms extends Sens
 {
     /**
      * Handle the send action.
      *
-     * @param  array  $params
      * @return void
-     * @throws \Seungmun\Sens\Exceptions\SensException
+     *
+     * @throws SensException
      */
     public function send(array $params)
     {
