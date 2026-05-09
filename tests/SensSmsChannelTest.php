@@ -2,20 +2,18 @@
 
 namespace Seungmun\Sens\Tests;
 
-use Mockery as m;
 use GuzzleHttp\Client;
+use Mockery as m;
+use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 
 class SensSmsChannelTest extends TestCase
 {
     /**
-     * @var \Mockery\MockInterface|\GuzzleHttp\Client
+     * @var MockInterface|Client
      */
     private $guzzleHttp;
 
-    /**
-     * @return void
-     */
     protected function setUp(): void
     {
         parent::setUp();
@@ -26,14 +24,11 @@ class SensSmsChannelTest extends TestCase
     /**
      * @return void
      */
-    public function testIamSorryBecauseTestsAreSoNuisance()
+    public function test_iam_sorry_because_tests_are_so_nuisance()
     {
         $this->assertTrue(true);
     }
 
-    /**
-     * @return void
-     */
     protected function tearDown(): void
     {
         m::close();

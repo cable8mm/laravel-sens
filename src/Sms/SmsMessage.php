@@ -2,8 +2,9 @@
 
 namespace Seungmun\Sens\Sms;
 
-use Seungmun\Sens\Contracts\SensMessage;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Illuminate\Http\UploadedFile;
+use Seungmun\Sens\Contracts\SensMessage;
 
 class SmsMessage implements SensMessage
 {
@@ -44,7 +45,6 @@ class SmsMessage implements SensMessage
     /**
      * Set SMS Type (ex: SMS, LMS)
      *
-     * @param  string  $type
      * @return $this
      */
     public function type(string $type)
@@ -57,7 +57,6 @@ class SmsMessage implements SensMessage
     /**
      * Set SMS Content Type (ex: COMM / AD)
      *
-     * @param  string  $contentType
      * @return $this
      */
     public function contentType(string $contentType)
@@ -70,7 +69,6 @@ class SmsMessage implements SensMessage
     /**
      * Set Country Code.
      *
-     * @param  int  $countryCode
      * @return $this
      */
     public function countryCode(int $countryCode)
@@ -83,7 +81,6 @@ class SmsMessage implements SensMessage
     /**
      * Set Sender's tel number.
      *
-     * @param  string  $from
      * @return $this
      */
     public function from(string $from)
@@ -96,7 +93,6 @@ class SmsMessage implements SensMessage
     /**
      * Set title only for LMS.
      *
-     * @param  string  $subject
      * @return $this
      */
     public function subject(string $subject)
@@ -109,7 +105,6 @@ class SmsMessage implements SensMessage
     /**
      * Set SMS Contents. (SMS: 80byte, LMS: 2000byte)
      *
-     * @param  string  $content
      * @return $this
      */
     public function content(string $content)
@@ -122,7 +117,6 @@ class SmsMessage implements SensMessage
     /**
      * Set Recipient's number.
      *
-     * @param  string  $to
      * @return $this
      */
     public function to(string $to)
@@ -137,22 +131,22 @@ class SmsMessage implements SensMessage
     /**
      * Add a new file into files for MMS message.
      *
-     * @param  string  $name
      * @param  mixed  $file
      * @return $this
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     *
+     * @throws FileNotFoundException
      */
     public function file(string $name, $file)
     {
         $body = null;
 
-        if ($file instanceof \Illuminate\Http\UploadedFile) {
-            /** @var \Illuminate\Http\UploadedFile $file */
+        if ($file instanceof UploadedFile) {
+            /** @var UploadedFile $file */
             $body = base64_encode($file->get());
         } elseif (is_string($file)) {
             $body = base64_encode(file_get_contents($file));
         } else {
-            throw new FileNotFoundException();
+            throw new FileNotFoundException;
         }
 
         array_push($this->files, [

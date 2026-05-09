@@ -46,7 +46,6 @@ class AlimTalkMessage
     }
 
     /**
-     * @param  string  $countryCode
      * @return $this
      */
     public function countryCode(string $countryCode)
@@ -57,7 +56,6 @@ class AlimTalkMessage
     }
 
     /**
-     * @param  string  $to
      * @return $this
      */
     public function to(string $to)
@@ -68,7 +66,6 @@ class AlimTalkMessage
     }
 
     /**
-     * @param  string  $content
      * @return $this
      */
     public function content(string $content)
@@ -79,7 +76,6 @@ class AlimTalkMessage
     }
 
     /**
-     * @param  array  $button
      * @return $this
      */
     public function addButton(array $button)
@@ -92,7 +88,7 @@ class AlimTalkMessage
     /**
      * @param  string  $reserveTime
      * @param  string  $reserveTimeZone
-     * @return \Seungmun\Sens\AlimTalk\AlimTalkMessage
+     * @return AlimTalkMessage
      */
     public function setReserved($reserveTime, $reserveTimeZone = 'Asia/Seoul')
     {
@@ -103,7 +99,6 @@ class AlimTalkMessage
     }
 
     /**
-     * @param  string  $code
      * @return $this
      */
     public function setSchedule(string $code)
@@ -116,7 +111,6 @@ class AlimTalkMessage
     }
 
     /**
-     * @param  string  $id
      * @return $this
      */
     public function plusFriendId(string $id)
@@ -127,7 +121,6 @@ class AlimTalkMessage
     }
 
     /**
-     * @param  string  $code
      * @return $this
      */
     public function templateCode(string $code)
