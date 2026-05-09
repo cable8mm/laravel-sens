@@ -8,11 +8,8 @@ class SensException extends Exception
 {
     /**
      * Exception for Invalid NCLOUD SENS Tokens.
-     *
-     * @param  string  $message
-     * @return SensException
      */
-    public static function InvalidNCPTokens($message)
+    public static function InvalidNCPTokens(string $message): self
     {
         return new static($message);
     }

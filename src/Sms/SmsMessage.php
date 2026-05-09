@@ -8,29 +8,21 @@ use Seungmun\Sens\Contracts\SensMessage;
 
 class SmsMessage implements SensMessage
 {
-    /** @var string */
-    public $type = 'SMS';
+    public string $type = 'SMS';
 
-    /** @var string */
-    public $contentType = 'COMM';
+    public string $contentType = 'COMM';
 
-    /** @var int */
-    public $countryCode = 82;
+    public int $countryCode = 82;
 
-    /** @var string */
-    public $from;
+    public ?string $from;
 
-    /** @var string */
-    public $subject = null;
+    public ?string $subject = null;
 
-    /** @var string */
-    public $content;
+    public string $content = '';
 
-    /** @var array */
-    public $messages = [];
+    public array $messages = [];
 
-    /** @var array */
-    public $files = [];
+    public array $files = [];
 
     /**
      * Create a new SensSmsMessage instance.
@@ -47,7 +39,7 @@ class SmsMessage implements SensMessage
      *
      * @return $this
      */
-    public function type(string $type)
+    public function type(string $type): static
     {
         $this->type = strtoupper($type);
 
@@ -59,7 +51,7 @@ class SmsMessage implements SensMessage
      *
      * @return $this
      */
-    public function contentType(string $contentType)
+    public function contentType(string $contentType): static
     {
         $this->contentType = strtoupper($contentType);
 
@@ -71,7 +63,7 @@ class SmsMessage implements SensMessage
      *
      * @return $this
      */
-    public function countryCode(int $countryCode)
+    public function countryCode(int $countryCode): static
     {
         $this->countryCode = $countryCode;
 
@@ -83,7 +75,7 @@ class SmsMessage implements SensMessage
      *
      * @return $this
      */
-    public function from(string $from)
+    public function from(string $from): static
     {
         $this->from = str_replace('-', '', $from);
 
@@ -95,7 +87,7 @@ class SmsMessage implements SensMessage
      *
      * @return $this
      */
-    public function subject(string $subject)
+    public function subject(string $subject): static
     {
         $this->subject = $subject;
 
@@ -107,7 +99,7 @@ class SmsMessage implements SensMessage
      *
      * @return $this
      */
-    public function content(string $content)
+    public function content(string $content): static
     {
         $this->content = $content;
 
@@ -119,11 +111,11 @@ class SmsMessage implements SensMessage
      *
      * @return $this
      */
-    public function to(string $to)
+    public function to(string $to): static
     {
-        array_push($this->messages, [
+        $this->messages[] = [
             'to' => str_replace('-', '', $to),
-        ]);
+        ];
 
         return $this;
     }
@@ -131,12 +123,11 @@ class SmsMessage implements SensMessage
     /**
      * Add a new file into files for MMS message.
      *
-     * @param  mixed  $file
      * @return $this
      *
      * @throws FileNotFoundException
      */
-    public function file(string $name, $file)
+    public function file(string $name, mixed $file): static
     {
         $body = null;
 
@@ -149,20 +140,18 @@ class SmsMessage implements SensMessage
             throw new FileNotFoundException;
         }
 
-        array_push($this->files, [
+        $this->files[] = [
             'name' => $name,
             'body' => $body,
-        ]);
+        ];
 
         return $this;
     }
 
     /**
      * Serialize to Array.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         $resource = [
             'type' => $this->type,

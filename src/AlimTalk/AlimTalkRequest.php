@@ -2,35 +2,31 @@
 
 namespace Seungmun\Sens\AlimTalk;
 
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
 
 class AlimTalkRequest
 {
-    /** @var string */
-    public $plusFriendId = '';
+    public string $plusFriendId = '';
 
-    /** @var string */
-    public $templateCode = '';
+    public string $templateCode = '';
 
     /** @var array|AlimTalkMessage[] */
-    public $messages = [];
+    public array $messages = [];
 
-    /** @var string */
-    public $reserveTime = '';
+    public string $reserveTime = '';
 
-    /** @var string */
-    public $reserveTimeZone = '';
+    public string $reserveTimeZone = '';
 
-    /** @var string */
-    public $scheduleCode = '';
+    public string $scheduleCode = '';
 
     public function __construct(array $params)
     {
         $this->mappingParams($params);
     }
 
-    protected function mappingParams(array $params)
+    protected function mappingParams(array $params): void
     {
         $attributes = ['plusFriendId', 'templateCode', 'messages', 'reserveTime', 'reserveTimeZone', 'scheduleCode'];
 
@@ -43,10 +39,7 @@ class AlimTalkRequest
         }
     }
 
-    /**
-     * @return \Illuminate\Contracts\Validation\Validator
-     */
-    public function validator()
+    public function validator(): ValidatorContract
     {
         return Validator::make($this->toArray(), [
             'plusFriendId' => 'required',
@@ -61,23 +54,20 @@ class AlimTalkRequest
     /**
      * @return $this
      */
-    public function addMessage(AlimTalkMessage $message)
+    public function addMessage(AlimTalkMessage $message): static
     {
         $this->messages[] = $message;
 
         return $this;
     }
 
-    /**
-     * @return array
-     */
-    public function toArray()
+    public function toArray(): array
     {
         $buffer = [
             'plusFriendId' => $this->plusFriendId,
             'templateCode' => $this->templateCode,
             'messages' => array_map(
-                function (AlimTalkMessage $message) {
+                function (AlimTalkMessage $message): array {
                     return $message->toArray();
                 },
                 $this->messages
