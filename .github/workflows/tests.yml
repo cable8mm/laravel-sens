@@ -1,8 +1,11 @@
 name: tests
 
 on:
-    push:
-    pull_request:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
 
 jobs:
     tests:
@@ -15,7 +18,7 @@ jobs:
                 php: [ 8.1, 8.2, 8.3, 8.4 ]
                 stability: [prefer-stable]
 
-        name: P${{ matrix.php }}
+        name: PHP ${{ matrix.php }}
 
         steps:
             - name: Checkout code
@@ -25,14 +28,13 @@ jobs:
               uses: shivammathur/setup-php@v2
               with:
                   php-version: ${{ matrix.php }}
-                  tools: composer:v2
                   coverage: none
 
             - name: Validate composer.json and composer.lock
               run: composer validate
 
             - name: Install dependencies
-              run: composer update --prefer-dist --no-interaction --no-progress
+              run: composer install --prefer-dist --no-progress --no-suggest
 
             - name: Execute tests
-              run: vendor/bin/phpunit --verbose
+              run: composer test
