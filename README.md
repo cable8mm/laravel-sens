@@ -1,226 +1,168 @@
-# NCLOUD SENS notifications channel for Laravel
+# Laravel NCLOUD SENS Notification Channel
 
-[![Latest Stable Version](https://poser.pugx.org/seungmun/laravel-sens/v)](//packagist.org/packages/seungmun/laravel-sens)
-[![Total Downloads](https://poser.pugx.org/seungmun/laravel-sens/downloads)](//packagist.org/packages/seungmun/laravel-sens)
-[![License](https://poser.pugx.org/seungmun/laravel-sens/license)](//packagist.org/packages/seungmun/laravel-sens)
-<a href="https://github.com/seungmun/sens-php/actions">
-    <img src="https://github.com/seungmun/laravel-sens/workflows/tests/badge.svg" alt="Build Status">
-</a>
+[![Latest Stable Version](https://poser.pugx.org/cable8mm/laravel-sens/v)](https://packagist.org/packages/cable8mm/laravel-sens)
+[![Total Downloads](https://poser.pugx.org/cable8mm/laravel-sens/downloads)](https://packagist.org/packages/cable8mm/laravel-sens)
+[![License](https://poser.pugx.org/cable8mm/laravel-sens/license)](https://packagist.org/packages/cable8mm/laravel-sens)
+[![Tests](https://github.com/cable8mm/laravel-sens/actions/workflows/tests.yml/badge.svg)](https://github.com/cable8mm/laravel-sens/actions/workflows/tests.yml)
 
-This package makes it easy to send notification using [ncloud sens](//ncloud.com/product/applicationService/sens) with Laravel.
+Laravel notification channels for [NAVER Cloud Platform SENS](https://www.ncloud.com/product/applicationService/sens).
 
-And We are working on an unofficial sdk development public project so that ncloud sens can be used in php more flexibly.
+This package is a maintained fork of [`seungmun/laravel-sens`](https://github.com/seungmun/laravel-sens). The original package provided the foundation for sending SMS, MMS, and Kakao AlimTalk notifications through NCLOUD SENS. This fork keeps the package usable with current PHP and Laravel versions while preserving the existing public API as much as possible.
 
-You can check the project here. (https://github.com/seungmun/sens-php)
+## Features
 
-## Official Community
+- SMS and LMS notifications
+- MMS notifications with file attachment support
+- Kakao AlimTalk notifications
+- Laravel notification channel integration
+- Auto-discovery service provider
 
-- [라라벨코리아](https://laravel.kr/)
-- [라라벨코리아 오픈채팅](https://open.kakao.com/o/g3dWlf0)
+## Requirements
 
-## Prerequisites
-
-Before you get started, you need the following:
-
-- PHP >= 7.2 (9.x also compatible)
-- Laravel (9.x / 8.x / 7.x / 6.x)
+- PHP 8.1 or higher
+- Laravel 10, 11, 12, or 13
+- NCLOUD SENS credentials and service IDs
 
 ## Installation
 
-You can install the package via composer:
+Install the package with Composer:
 
-``` bash
-composer require seungmun/laravel-sens
+```bash
+composer require cable8mm/laravel-sens
 ```
 
-The package will automatically register itself.
+Laravel will automatically discover the service provider.
 
-You can publish the config with:
+Publish the configuration file when you want to customize it:
+
 ```bash
 php artisan vendor:publish --provider="Seungmun\Sens\SensServiceProvider" --tag="config"
 ```
 
-Also, you can use it without publish the config file can be used simply by adding environment variables with:
+## Configuration
 
-```bash
-SENS_ACCESS_KEY=your-sens-access-key
-SENS_SECRET_KEY=your-sens-secret-key
-SENS_SERVICE_ID=your-sens-service-id
-SENS_ALIMTALK_SERVICE_ID=your-alimtalk-service-id
-SENS_PlUS_FRIEND_ID=your-plus-friend-id
-```
-
-If you want to put the `sms_from` value in your .env,
-
-config/services.php
-
-```php
-/*
-|--------------------------------------------------------------------------
-| SMS "From" Number
-|--------------------------------------------------------------------------
-|
-| This configuration option defines the phone number that will be used as
-| the "from" number for all outgoing text messages. You should provide
-| the number you have already reserved within your Naver Cloud Platform
-| /sens/sms-calling-number of dashboard.
-|
-*/
-'sens' => [
-    'services' => [
-        'sms' => [
-            'sender' => env('SENS_SMS_FROM'),
-        ],
-    ],
-],
-```
-
-.env:
+Add your NCLOUD SENS credentials to `.env`:
 
 ```env
-SENS_SMS_FROM=1234567890
+SENS_ACCESS_KEY=your-sens-access-key
+SENS_SECRET_KEY=your-sens-secret-key
+SENS_SERVICE_ID=your-sms-service-id
+SENS_ALIMTALK_SERVICE_ID=your-alimtalk-service-id
+SENS_PlUS_FRIEND_ID=@your-plus-friend-id
 ```
+
+The `SENS_PlUS_FRIEND_ID` key keeps the spelling used by the original package configuration.
+
+If you publish the configuration, it will be available at `config/laravel-sens.php`.
 
 ## Usage
 
-This package can be used using with the Laravel default notification feature.
+Use this package through Laravel's built-in notification system.
 
-##### 1) Request to send a SMS
+### Sending SMS
+
+Create a notification:
 
 ```bash
 php artisan make:notification SendPurchaseReceipt
 ```
 
+Return `SmsChannel::class` from `via()` and build an `SmsMessage` from `toSms()`:
+
 ```php
 <?php
 
 namespace App\Notifications;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Notification;
 use Seungmun\Sens\Sms\SmsChannel;
 use Seungmun\Sens\Sms\SmsMessage;
-use Illuminate\Notifications\Notification;
 
 class SendPurchaseReceipt extends Notification
 {
     use Queueable;
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return [SmsChannel::class];
     }
 
-    /**
-     * Get the sens sms representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return SmsMessage
-     */
-    public function toSms($notifiable)
+    public function toSms($notifiable): SmsMessage
     {
-        return (new SmsMessage)
+        return (new SmsMessage())
             ->to($notifiable->phone)
             ->from('055-000-0000')
-            ->content('Welcome: https://open.kakao.com/o/g3dWlf0')
-            ->contentType('AD')// You can ignore it (default: COMM)
-            ->type('SMS');  // You can ignore it (default: SMS)
+            ->content('Your purchase receipt is ready.')
+            ->contentType('COMM')
+            ->type('SMS');
     }
 }
 ```
 
+Send the notification as usual:
+
 ```php
-use App\User;
+use App\Models\User;
 use App\Notifications\SendPurchaseReceipt;
 
-User::find(1)->notify(new SendPurchaseReceipt);
+User::find(1)->notify(new SendPurchaseReceipt());
 ```
 
-##### 2) Request to send MMS
+### Sending MMS
 
-```bash
-php artisan make:notification SendPurchaseInvoice
-```
+Use `type('MMS')` and attach a file path or an `Illuminate\Http\UploadedFile` instance:
 
 ```php
 <?php
 
 namespace App\Notifications;
+
 use Illuminate\Bus\Queueable;
-use Seungmun\Sens\Sms\SmsChannel;
-use Seungmun\Sens\Sms\SmsMessage;
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
+use Seungmun\Sens\Sms\SmsChannel;
+use Seungmun\Sens\Sms\SmsMessage;
 
 class SendPurchaseInvoice extends Notification
 {
     use Queueable;
-    
-    /** @var UploadedFile */
-    private $image;
-    
-    /**
-     * Create a new notification instance.
-     *
-     * @param  UploadedFile  $image
-     */
-    public function __construct(UploadedFile $image)
+
+    public function __construct(private UploadedFile $image)
     {
-        $this->image = $image;
     }
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return [SmsChannel::class];
     }
 
     /**
-     * Get the sens sms representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return SmsMessage
      * @throws FileNotFoundException
      */
-    public function toSms($notifiable)
+    public function toSms($notifiable): SmsMessage
     {
-        return (new SmsMessage)
+        return (new SmsMessage())
             ->type('MMS')
             ->to($notifiable->phone)
             ->from('055-000-0000')
-            ->content('This is your invoice.\nCheck out the attached image.')
-            /* file's path string or UploadedFile object of Illuminate are allowed */
-            ->file('filename.jpg', $this->image);
+            ->content("This is your invoice.\nCheck out the attached image.")
+            ->file('invoice.jpg', $this->image);
     }
 }
 ```
 
 ```php
-<?php
+use App\Models\User;
+use App\Notifications\SendPurchaseInvoice;
 
-use App\User;
-use App\Notifications\SendPurchaseReceipt;
-
-// In this case, you should only pass UploadedFile object as a parameter.
-// If when you need to pass a file path string as a parameter, change your notification class up.
-User::find(1)->notify(new SendPurchaseReceipt(request()->file('image')));
+User::find(1)->notify(new SendPurchaseInvoice(request()->file('image')));
 ```
 
+### Sending AlimTalk
 
-Now `User id: 1` which has own phone attribute would receive a sms or mms message soon.
-
-##### 3) Request send AlimTalk
+Return `AlimTalkChannel::class` from `via()` and build an `AlimTalkMessage` from `toAlimTalk()`:
 
 ```php
 <?php
@@ -232,41 +174,54 @@ use Illuminate\Notifications\Notification;
 use Seungmun\Sens\AlimTalk\AlimTalkChannel;
 use Seungmun\Sens\AlimTalk\AlimTalkMessage;
 
-class SendPurchaseInvoice extends Notification
+class SendShippingNotice extends Notification
 {
     use Queueable;
 
-    /**
-     * Get the notification's delivery channels.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
+    public function via($notifiable): array
     {
         return [AlimTalkChannel::class];
     }
 
-    /**
-     * Get the sens sms representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return \Seungmun\Sens\AlimTalk\AlimTalkMessage
-     */
-    public function toAlimTalk($notifiable)
+    public function toAlimTalk($notifiable): AlimTalkMessage
     {
         return (new AlimTalkMessage())
-            ->templateCode('TEMPLATE001') // required
-            ->to($notifiable->phone) // required
-            ->content('Evans, Your order is shipped.') //required
-            ->countryCode('82') // optional
-            ->addButton(['type' => 'DS', 'name' => 'Tracking of Shipment']) // optional
-            ->setReserved('2020-05-31 14:20', 'Asia/Seoul'); // optional
+            ->templateCode('TEMPLATE001')
+            ->to($notifiable->phone)
+            ->content('Your order has been shipped.')
+            ->countryCode('82')
+            ->addButton(['type' => 'DS', 'name' => 'Tracking of Shipment'])
+            ->setReserved('2026-05-31 14:20', 'Asia/Seoul');
     }
 }
 ```
 
-## Features
+## Compatibility Notes
 
-- SMS(LMS) and MMS
-- Kakao Alimtalk
+The Composer package name is `cable8mm/laravel-sens`, but the PHP namespace remains `Seungmun\Sens` for backward compatibility with the original package.
+
+If you are migrating from `seungmun/laravel-sens`, replace the Composer package and keep your existing notification code:
+
+```bash
+composer remove seungmun/laravel-sens
+composer require cable8mm/laravel-sens
+```
+
+## Contributing
+
+Issues and pull requests are welcome. Please keep changes focused, include tests for behavior changes, and run the test suite before opening a pull request:
+
+```bash
+composer test
+composer lint
+```
+
+## Credits
+
+- [Seungmun Jeong](https://github.com/seungmun), original author
+- [Samgu Lee](https://github.com/cable8mm), fork maintainer
+- All contributors to the original and forked packages
+
+## License
+
+This package is open-sourced software licensed under the [MIT license](LICENSE.md).
