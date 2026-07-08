@@ -71,9 +71,4 @@ class SensAlimTalkChannelTest extends TestCase
 
         $this->addToAssertionCount(1);
     }
-
-    protected function tearDown(): void
-    {
-        m::close();
-    }
 }
