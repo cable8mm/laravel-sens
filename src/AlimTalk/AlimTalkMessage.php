@@ -106,6 +106,10 @@ class AlimTalkMessage
      */
     public function templateCode(string $code): static
     {
+        if (empty($code)) {
+            throw new \InvalidArgumentException('Template code cannot be empty.');
+        }
+
         $this->templateCode = $code;
 
         return $this;

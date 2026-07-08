@@ -133,12 +133,20 @@ class SmsMessage implements SensMessage
 
         if ($file instanceof UploadedFile) {
             /** @var UploadedFile $file */
-            $body = base64_encode($file->get());
+            $content = $file->get();
         } elseif (is_string($file)) {
-            $body = base64_encode(file_get_contents($file));
+            $content = file_get_contents($file);
         } else {
             throw new FileNotFoundException;
         }
+
+        $maxSize = 1024 * 1024; // 1MB limit
+
+        if (strlen($content) > $maxSize) {
+            throw new FileNotFoundException('File size exceeds 1MB limit.');
+        }
+
+        $body = base64_encode($content);
 
         $this->files[] = [
             'name' => $name,
