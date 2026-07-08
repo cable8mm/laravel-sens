@@ -5,7 +5,6 @@ namespace Seungmun\Sens\Tests;
 use Illuminate\Notifications\Notification;
 use Mockery as m;
 use Mockery\MockInterface;
-use PHPUnit\Framework\TestCase;
 use Seungmun\Sens\Sms\Sms;
 use Seungmun\Sens\Sms\SmsChannel;
 use Seungmun\Sens\Sms\SmsMessage;
@@ -65,10 +64,5 @@ class SensSmsChannelTest extends TestCase
         (new SmsChannel($this->sms))->send($notifiable, $notification);
 
         $this->addToAssertionCount(1);
-    }
-
-    protected function tearDown(): void
-    {
-        m::close();
     }
 }

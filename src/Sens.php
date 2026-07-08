@@ -38,7 +38,10 @@ abstract class Sens implements SensContract
      */
     protected function httpClient(): Client
     {
-        return $this->http ?: $this->http = new Client;
+        return $this->http ?: $this->http = new Client([
+            'timeout' => 30,
+            'connect_timeout' => 10,
+        ]);
     }
 
     /**

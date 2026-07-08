@@ -3,6 +3,7 @@
 namespace Seungmun\Sens\Sms;
 
 use Exception;
+use Illuminate\Support\Facades\Log;
 use Seungmun\Sens\Exceptions\SensException;
 use Seungmun\Sens\Sens;
 
@@ -36,6 +37,11 @@ class Sms extends Sens
                 'body' => json_encode($params),
             ]);
         } catch (Exception $e) {
+            Log::error('SENS SMS send failed', [
+                'message' => $e->getMessage(),
+                'exception' => get_class($e),
+            ]);
+
             throw new SensException($e);
         }
     }

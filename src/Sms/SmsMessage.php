@@ -133,12 +133,20 @@ class SmsMessage implements SensMessage
 
         if ($file instanceof UploadedFile) {
             /** @var UploadedFile $file */
-            $body = base64_encode($file->get());
+            $content = $file->get();
         } elseif (is_string($file)) {
-            $body = base64_encode(file_get_contents($file));
+            $content = file_get_contents($file);
         } else {
             throw new FileNotFoundException;
         }
+
+        $maxSize = 1024 * 1024; // 1MB limit
+
+        if (strlen($content) > $maxSize) {
+            throw new FileNotFoundException('File size exceeds 1MB limit.');
+        }
+
+        $body = base64_encode($content);
 
         $this->files[] = [
             'name' => $name,
@@ -158,10 +166,14 @@ class SmsMessage implements SensMessage
             'contentType' => $this->contentType,
             'countryCode' => strval($this->countryCode),
             'from' => $this->from,
-            'subject' => $this->subject,
-            'content' => $this->content,
-            'messages' => $this->messages,
         ];
+
+        if ($this->subject !== null) {
+            $resource['subject'] = $this->subject;
+        }
+
+        $resource['content'] = $this->content;
+        $resource['messages'] = $this->messages;
 
         if (! empty($this->files)) {
             $resource['files'] = $this->files;

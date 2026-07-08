@@ -2,6 +2,7 @@
 
 namespace Seungmun\Sens\Tests;
 
+use Mockery;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Seungmun\Sens\SensServiceProvider;
 
@@ -22,5 +23,14 @@ abstract class TestCase extends OrchestraTestCase
         $app['config']->set('laravel-sens.access_key', 'access-key');
         $app['config']->set('laravel-sens.secret_key', 'secret-key');
         $app['config']->set('services.sens.services.sms.sender', '055-000-0000');
+    }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        if (class_exists(Mockery::class)) {
+            Mockery::close();
+        }
     }
 }
