@@ -50,6 +50,11 @@ class SensServiceProvider extends ServiceProvider
      */
     public function provides(): array
     {
-        return [];
+        return [
+            Sms::class,
+            AlimTalk::class,
+            SmsChannel::class,
+            AlimTalkChannel::class,
+        ];
     }
 }

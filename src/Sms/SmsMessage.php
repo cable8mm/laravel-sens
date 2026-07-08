@@ -158,10 +158,14 @@ class SmsMessage implements SensMessage
             'contentType' => $this->contentType,
             'countryCode' => strval($this->countryCode),
             'from' => $this->from,
-            'subject' => $this->subject,
-            'content' => $this->content,
-            'messages' => $this->messages,
         ];
+
+        if ($this->subject !== null) {
+            $resource['subject'] = $this->subject;
+        }
+
+        $resource['content'] = $this->content;
+        $resource['messages'] = $this->messages;
 
         if (! empty($this->files)) {
             $resource['files'] = $this->files;
