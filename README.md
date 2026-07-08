@@ -11,11 +11,12 @@ This package is a maintained fork of [`seungmun/laravel-sens`](https://github.co
 
 ## Features
 
-- SMS and LMS notifications
-- MMS notifications with file attachment support
-- Kakao AlimTalk notifications
+- SMS and LMS (Long SMS) notifications
+- MMS notifications with file attachment support (max 1MB)
+- Kakao AlimTalk notifications with buttons and scheduling
 - Laravel notification channel integration
 - Auto-discovery service provider
+- Support for multiple recipients
 
 ## Requirements
 
@@ -100,6 +101,45 @@ class SendPurchaseReceipt extends Notification
     }
 }
 ```
+
+**Sending to Multiple Recipients:**
+
+You can send to multiple recipients by chaining the `to()` method:
+
+```php
+public function toSms($notifiable): SmsMessage
+{
+    return (new SmsMessage())
+        ->to('010-1234-5678')
+        ->to('010-8765-4321')
+        ->from('055-000-0000')
+        ->content('Your purchase receipt is ready.')
+        ->contentType('COMM')
+        ->type('SMS');
+}
+```
+
+**SMS vs LMS:**
+
+- **SMS**: Up to 80 bytes (Korean text: ~40 characters)
+- **LMS**: Up to 2000 bytes (supports subject line)
+
+Use `type('LMS')` and `subject()` for longer messages:
+
+```php
+return (new SmsMessage())
+    ->to($notifiable->phone)
+    ->from('055-000-0000')
+    ->subject('Monthly Newsletter')
+    ->content('This is a long message...')
+    ->contentType('COMM')
+    ->type('LMS');
+```
+
+**Content Type:**
+
+- `COMM`: Commercial message (광고성 메시지)
+- `AD`: Advertisement (광고 메시지)
 
 Send the notification as usual:
 
@@ -197,6 +237,49 @@ class SendShippingNotice extends Notification
 }
 ```
 
+**Adding Buttons:**
+
+You can add interactive buttons to AlimTalk messages:
+
+```php
+return (new AlimTalkMessage())
+    ->templateCode('TEMPLATE001')
+    ->to($notifiable->phone)
+    ->content('Your order has been shipped.')
+    ->addButton(['type' => 'DS', 'name' => 'Track Order'])  // Deep Link
+    ->addButton(['type' => 'WL', 'name' => 'Visit Website']);  // Web Link
+```
+
+**Button Types:**
+
+- `DS`: Deep Link (앱으로 이동)
+- `WL`: Web Link (웹 페이지로 이동)
+- `BK`: Block (메시지 차단)
+- `MD`: Message Delivery (메시지 전달)
+
+**Scheduled Messages:**
+
+Schedule messages for future delivery:
+
+```php
+return (new AlimTalkMessage())
+    ->templateCode('TEMPLATE001')
+    ->to($notifiable->phone)
+    ->content('Reminder: Your appointment is tomorrow.')
+    ->setReserved('2026-06-01 09:00', 'Asia/Seoul');
+```
+
+**Custom Plus Friend ID:**
+
+Override the default Plus Friend ID:
+
+```php
+return (new AlimTalkMessage('@custom-plus-friend'))
+    ->templateCode('TEMPLATE001')
+    ->to($notifiable->phone)
+    ->content('Hello!');
+```
+
 ## Compatibility Notes
 
 The Composer package name is `cable8mm/laravel-sens`, but the PHP namespace remains `Seungmun\Sens` for backward compatibility with the original package.
@@ -222,6 +305,59 @@ composer lint
 - [Seungmun Jeong](https://github.com/seungmun), original author
 - [Samgu Lee](https://github.com/cable8mm), fork maintainer
 - All contributors to the original and forked packages
+
+## Troubleshooting
+
+### Common Issues
+
+**1. "NCP tokens are invalid" Error**
+
+This error occurs when your configuration is incomplete or incorrect. Check the following:
+
+- Verify that all environment variables are set in your `.env` file
+- Ensure you're using the correct Service IDs (SMS and AlimTalk have different Service IDs)
+- Check that your Access Key and Secret Key are correct
+- Make sure there are no extra spaces in your `.env` values
+
+```bash
+# Verify your configuration
+php artisan tinker
+>>> config('laravel-sens')
+```
+
+**2. File Upload Fails for MMS**
+
+- Ensure the file size is under 1MB
+- Check that the file path is correct and readable
+- For uploaded files, use `request()->file('image')` instead of `request()->input('image')`
+
+**3. AlimTalk Template Code Not Working**
+
+- Verify the template code exists in your NCLOUD SENS console
+- Ensure the template is approved and in "Active" status
+- Check that your Plus Friend ID matches the one registered in NCLOUD
+
+**4. Messages Not Being Sent**
+
+- Check your Laravel logs (`storage/logs/laravel.log`) for detailed error messages
+- Verify your NCLOUD SENS balance and service status
+- Ensure your server can reach `sens.apigw.ntruss.com`
+
+### Debugging Tips
+
+Enable debug logging to see detailed API requests and responses:
+
+```php
+// In your .env
+LOG_CHANNEL=stack
+LOG_LEVEL=debug
+```
+
+The package logs errors with context when API calls fail:
+
+- Error messages
+- Exception types
+- Request parameters (without sensitive data)
 
 ## License
 
