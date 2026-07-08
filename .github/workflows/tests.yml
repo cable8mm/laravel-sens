@@ -1,15 +1,14 @@
 name: tests
 
 on:
-  workflow_dispatch:
-  pull_request:
-  push:
-    branches:
-      - main
+    workflow_dispatch:
+    pull_request:
+    push:
+        branches:
+            - main
 
 jobs:
     tests:
-
         runs-on: ubuntu-latest
 
         strategy:
@@ -64,6 +63,7 @@ jobs:
 
             - name: Install dependencies
               run: |
+                  composer config policy.advisories.block false
                   composer require \
                       "illuminate/support:${{ matrix.laravel }}" \
                       "illuminate/notifications:${{ matrix.laravel }}" \
