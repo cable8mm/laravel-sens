@@ -14,6 +14,7 @@ This package is a maintained fork of [`seungmun/laravel-sens`](https://github.co
 - SMS and LMS (Long SMS) notifications
 - MMS notifications with file attachment support (max 1MB)
 - Kakao AlimTalk notifications with buttons and scheduling
+- Optional country-based SMS channel routing (SENS, AWS SNS, Vonage, or blocked)
 - Laravel notification channel integration
 - Auto-discovery service provider
 - Support for multiple recipients
@@ -55,7 +56,7 @@ SENS_PlUS_FRIEND_ID=@your-plus-friend-id
 
 The `SENS_PlUS_FRIEND_ID` key keeps the spelling used by the original package configuration.
 
-If you publish the configuration, it will be available at `config/laravel-sens.php`.
+If you publish the configuration, it will be available at `config/laravel-sens.php`. Besides the credential keys, the published config also contains a `routing` section used by the optional `SmsChannelResolver` (see "Routing SMS by Country" below). All of its keys are optional and default to the built-in country lists.
 
 ## Usage
 
@@ -149,6 +150,66 @@ use App\Notifications\SendPurchaseReceipt;
 
 User::find(1)->notify(new SendPurchaseReceipt());
 ```
+
+**Routing SMS by Country (Optional):**
+
+If your application sends SMS globally, the delivery channel you want can differ per country. The package ships an optional `SmsChannelResolver` that picks the notification channel from an ISO 3166-1 alpha-2 country code. The returned value is a ready-to-use `via()` array:
+
+```php
+<?php
+
+namespace App\Notifications;
+
+use Illuminate\Notifications\Notification;
+use Seungmun\Sens\Support\SmsChannelResolver;
+
+class SendPurchaseReceipt extends Notification
+{
+    // ...
+
+    public function via($notifiable): array
+    {
+        return app(SmsChannelResolver::class)->resolve($notifiable->tel_verify_iso2);
+    }
+}
+```
+
+Resolution rules, first match wins:
+
+1. **Blocked countries** (`routing.blocked_countries`) -> `[]`, the notification is not sent
+2. **NCP SENS countries** (`routing.ncp_countries`) -> `[SmsChannel::class]`
+3. **AWS SNS countries** (`routing.aws_countries`) -> `[NotificationChannels\AwsSns\SnsChannel::class]`
+4. **Anything else** -> `routing.channels.fallback` (default `'vonage'`)
+
+The built-in default country lists ship with the package (see `Seungmun\Sens\Support\SmsChannelResolver`) and mirror the provider delivery policies:
+
+- https://guide.ncloud-docs.com/docs/sens-smspolicy
+- https://docs.aws.amazon.com/sns/latest/dg/sns-supported-regions-countries.html
+
+Every key is optional; missing keys use the built-in defaults, and `null` entries mean "use the default". After publishing the config you can replace any list wholesale:
+
+```php
+// config/laravel-sens.php
+'routing' => [
+    'blocked_countries' => ['MG', 'LK'],
+    'ncp_countries' => ['KR', 'US', 'JP'],
+    'aws_countries' => ['AT', 'ST'],
+    'channels' => [
+        'ncp' => Seungmun\Sens\Sms\SmsChannel::class,
+        'aws' => NotificationChannels\AwsSns\SnsChannel::class,
+        'fallback' => 'vonage',
+    ],
+],
+```
+
+The AWS SNS and Vonage channels are **optional dependencies** of this package. If you route to them, install the matching channel in your application first:
+
+```bash
+composer require laravel-notification-channels/aws-sns
+composer require laravel/vonage-notification-channel
+```
+
+If the routed channel is not installed, Laravel raises a `Class not found` error when the notification is sent.
 
 ### Sending MMS
 

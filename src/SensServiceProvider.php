@@ -7,6 +7,7 @@ use Seungmun\Sens\AlimTalk\AlimTalk;
 use Seungmun\Sens\AlimTalk\AlimTalkChannel;
 use Seungmun\Sens\Sms\Sms;
 use Seungmun\Sens\Sms\SmsChannel;
+use Seungmun\Sens\Support\SmsChannelResolver;
 
 class SensServiceProvider extends ServiceProvider
 {
@@ -33,6 +34,11 @@ class SensServiceProvider extends ServiceProvider
             ->give(function ($app): AlimTalk {
                 return new AlimTalk($app['config']->get('laravel-sens'));
             });
+
+        // Register the country-based SMS channel resolver.
+        $this->app->singleton(SmsChannelResolver::class, function ($app): SmsChannelResolver {
+            return new SmsChannelResolver($app['config']->get('laravel-sens.routing'));
+        });
     }
 
     /**
@@ -55,6 +61,7 @@ class SensServiceProvider extends ServiceProvider
             AlimTalk::class,
             SmsChannel::class,
             AlimTalkChannel::class,
+            SmsChannelResolver::class,
         ];
     }
 }
