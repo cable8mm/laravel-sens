@@ -29,6 +29,8 @@ src/
 │   ├── AlimTalk.php (AlimTalk API client)
 │   ├── AlimTalkChannel.php (Laravel notification channel)
 │   └── AlimTalkMessage.php (Message builder)
+├── Support/
+│   └── SmsChannelResolver.php (Country -> channel routing for via())
 └── Exceptions/
     └── SensException.php (Custom exceptions)
 ```
@@ -65,6 +67,16 @@ src/
     - `makeSignature(string $method, string $uri, string $timestamp): string` - Generate HMAC signature
     - `resolveEndpoint(string $uri, array $params): array` - Parse URI template
 - **HTTP Client**: Guzzle with 30s timeout, 10s connect timeout
+
+### SmsChannelResolver.php (Country Routing)
+
+- **Namespace**: `Seungmun\Sens\Support`
+- **Purpose**: Pick the notification channel(s) for `Notification::via()` from an ISO 3166-1 alpha-2 country code
+- **Rules** (first match wins): blocked list -> `[]`, NCP SENS list -> `[SmsChannel::class]`, AWS SNS list -> `['NotificationChannels\AwsSns\SnsChannel']`, otherwise -> `routing.channels.fallback` (default `'vonage'`)
+- **Default lists**: Private constants in the class; every list can be replaced per key via the `laravel-sens.routing` config (`null` means "use built-in default")
+- **Binding**: Registered as a singleton in `SensServiceProvider` reading `config('laravel-sens.routing')`
+- **Optional dependencies**: AWS SNS (`laravel-notification-channels/aws-sns`) and Vonage (`laravel/vonage-notification-channel`) are declared in `suggest`, never in `require`
+- **Note**: `::class` constants are compile-time strings, so referencing channels that are not installed is safe
 
 ### Sms.php
 
@@ -128,7 +140,7 @@ SENS_PLUS_FRIEND_ID=@your-plus-friend-id
 ### Config File
 
 - Published to: `config/laravel-sens.php`
-- Keys: `service_id`, `alimtalk_service_id`, `plus_friend_id`, `access_key`, `secret_key`
+- Keys: `service_id`, `alimtalk_service_id`, `plus_friend_id`, `access_key`, `secret_key`, `routing` (optional overrides for the SMS country routing; see "SmsChannelResolver.php" above)
 
 ## API Details
 
@@ -177,6 +189,7 @@ tests/
 ├── SmsMessageEdgeCaseTest.php (Edge cases)
 ├── AlimTalkMessageTest.php (AlimTalk message serialization)
 ├── AlimTalkMessageSetReservedTest.php (Scheduling)
+├── SmsChannelResolverTest.php (Country -> channel routing)
 ├── SensServiceProviderTest.php (DI and config)
 ├── SensSmsChannelTest.php (SMS channel integration)
 └── SensAlimTalkChannelTest.php (AlimTalk channel integration)
@@ -210,7 +223,7 @@ tests/
 composer test
 ```
 
-**Current Status**: 31 tests, 48 assertions, 0 failures, 0 risky
+**Current Status**: 41 tests, 76 assertions, 0 failures, 0 risky
 
 ## Coding Conventions
 
@@ -321,6 +334,13 @@ composer test
 - `illuminate/notifications`: ^10.0|^11.0|^12.0|^13.0 (Laravel notifications)
 - `mockery/mockery`: ^1.0 (Testing)
 - `orchestra/testbench`: ^8.0|^9.0|^10.0|^11.0 (Laravel package testing)
+
+### Optional Dependencies (`suggest`)
+
+- `laravel-notification-channels/aws-sns`: route SMS to AWS SNS for supported countries
+- `laravel/vonage-notification-channel`: use Vonage as the fallback SMS channel
+
+Never promote these to `require`; SENS-only users must not be forced to install them.
 
 ## File References
 
